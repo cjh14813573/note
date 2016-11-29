@@ -1,0 +1,40 @@
+sudo apt-get update
+生成的数字签名使用了弱安全性摘要算法。部分索引文件下载失败。
+-->>
+	/etc/apt/sources.list.d/ubuntukylin.list 将 trusty改成xenial
+	执行sudo apt-get update
+	然后执行sudo apt-get install uk-keyring,
+	重新sudo apt-get update
+
+默认root用户被锁定，su不能登陆-->>sudo passwd并设置密码
+
+64位linux中配置好编译器环境变量后仍然提示：没有那个文件或目录，说明对32位程序兼容有问题，安装兼容库
+-->>sudo apt-get install lib32ncurses5
+
+
+brackets：
+
+nfs：
+	安装nfs-kernel-service：
+		sudo apt-get install ntf-kernel-service
+	编辑/etc/exports,添加nfs文件夹
+		例： /home/song/nfs *(rw,sync,no_root_squash,no_subtree_check)
+	重启nfs和portmap服务
+		sudo service portmap restart
+		sudo service nfs-kernel-service restart
+	客户端mount：
+		mount -t nfs -o rw,nolock 10.16.0.151:/mnt/share_for_rtu /share
+
+arm-linux-gdb:
+	在pc运行arm-linux-gdb时出现缺少libncurses.so.5:
+		sudo apt-get install lib32ncurses5
+	在板端运行gdbserver：
+		./arm-linux-gdbserver host:1234 xxx
+	在pc运行gdb：
+		arm-linux-gdb xxx
+		break main
+		target remote ip:host
+	运行过程中报错：Program received signal SIG32, Real-time event 32.
+		两种解决办法：
+		(1)在gdb模式下，执行 “handle SIG32 pass noprint nostop”
+		(2)编译程序时， gcc 加上-static
